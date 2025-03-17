@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sari-Sari Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6b00;
+            --secondary-color: #ff9933;
+            --accent-color: #ffe6cc;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
+
+        .auth-form {
+            padding: 30px;
+        }
+
+        .nav-tabs {
+            border-bottom: none;
+        }
+
+        .nav-tabs .nav-link {
+            color: rgba(255,255,255,0.8);
+            border: none;
+            padding: 15px 30px;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .store-navbar {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .product-grid {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 1.25rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .category-header {
+            background: var(--accent-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background: #2c2c2c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .cart-btn {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .cart-modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-total {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Welcome to De Guzman's Sari-Sari Store</h2>
+                <p>Get your daily essentials at unbeatable prices</p>
+            </div>
+            
+            <div class="auth-form">
+                <ul class="nav nav-tabs" id="authTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" 
+                                data-bs-target="#login-content" type="button" role="tab">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="signup-tab" data-bs-toggle="tab" 
+                                data-bs-target="#signup-content" type="button" role="tab">Sign Up</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="authTabsContent">
+                    <div class="tab-pane fade show active" id="login-content" role="tabpanel">
+                        <form id="loginForm" class="mt-4">
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" placeholder="Password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="signup-content" role="tabpanel">
+                        <form id="signupForm" class="mt-4">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Full Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" placeholder="Password" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" placeholder="Confirm Password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="store-container" style="display: none;">
+        <nav class="store-navbar">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="text-primary mb-0">Sari-Sari Store</h3>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-danger me-3" id="logoutBtn">Logout</button>
+                        <button class="btn btn-primary position-relative cart-btn" data-bs-toggle="modal" data-bs-target="#cartModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                            </svg>
+                            <span class="cart-badge" id="cartCount">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="category-header">
+                <h4 class="mb-0"> Foods </h4>
+            </div>
+            
+            <div class="product-grid" id="foods">
+                <div class="product-card">
+                    <img src="noodles.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Instant Noodles</div>
+                        <div class="product-price">₱30.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Instant Noodles" data-price="12.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="canned.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Canned Goods</div>
+                        <div class="product-price">₱35.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Canned Goods" data-price="35.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="crackers.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">crackers</div>
+                        <div class="product-price">₱8.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Biscuits" data-price="8.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="rice.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Rice (1kg)</div>
+                        <div class="product-price">₱50.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Rice (1kg)" data-price="50.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="bars.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Snack Bars</div>
+                        <div class="product-price">₱15.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Snack Bars" data-price="15.00">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-header">
+                <h4 class="mb-0"> Beverages </h4>
+            </div>
+            
+            <div class="product-grid" id="beverages">
+                <div class="product-card">
+                    <img src="softdrink.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Soft Drinks</div>
+                        <div class="product-price">₱15.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Soft Drinks" data-price="15.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="water.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Mineral Water</div>
+                        <div class="product-price">₱10.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Mineral Water" data-price="10.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="juice.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Juice</div>
+                        <div class="product-price">₱20.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Juice" data-price="20.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="icetea.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Iced Tea</div>
+                        <div class="product-price">₱25.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Iced Tea" data-price="25.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="energydrink.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Energy Drink</div>
+                        <div class="product-price">₱20.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Energy Drink" data-price="30.00">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-header">
+                <h4 class="mb-0"> School Supplies </h4>
+            </div>
+            
+            <div class="product-grid" id="school-supplies">
+                <div class="product-card">
+                    <img src="notebook.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Notebook</div>
+                        <div class="product-price">₱25.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Notebook" data-price="25.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="pencil.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Pencils</div>
+                        <div class="product-price">₱10.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Pencils" data-price="5.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="pens.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Ballpen</div>
+                        <div class="product-price">₱10.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Ballpen" data-price="7.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="eraser.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Eraser</div>
+                        <div class="product-price">₱5.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Eraser" data-price="3.00">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="ruler.jpeg" class="product-img" alt="...">
+                    <div class="product-info">
+                        <div class="product-title">Ruler</div>
+                        <div class="product-price">₱15.00</div>
+                        <button class="btn btn-sm btn-primary mt-2 add-to-cart" 
+                                data-name="Ruler" data-price="10.00">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p> ™ 2010  Sari-Sari Store. All rights reserved.</p>
+        </div>
+
+        <div class="modal fade" id="cartModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Your Cart</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body cart-modal-body">
+                        <div id="cartItems"></div>
+                        <div class="cart-total text-end">Total: ₱<span id="cartTotal">0.00</span></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+                        <button type="button" class="btn btn-primary" id="checkoutBtn">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const cartCount = document.getElementById('cartCount');
+            
+            cartCount.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
+            
+            if(cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-center my-4">Your cart is empty</p>';
+                cartTotal.textContent = '0.00';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div>${item.name}</div>
+                        <small class="text-muted">₱${item.price.toFixed(2)}</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-sm btn-light me-2" onclick="updateCartItem('${item.id}', -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="btn btn-sm btn-light ms-2" onclick="updateCartItem('${item.id}', 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            cartTotal.textContent = total.toFixed(2);
+        }
+
+        function updateCartItem(id, delta) {
+            const index = cart.findIndex(item => item.id === id);
+            if(index === -1) return;
+
+            cart[index].quantity += delta;
+            if(cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCart();
+        }
+
+        function addToCart(name, price) {
+            const existingItem = cart.find(item => item.name === name);
+            if(existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    id: Date.now().toString(),
+                    name: name,
+                    price: parseFloat(price),
+                    quantity: 1
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCart();
+        }
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', () => {
+                const name = button.dataset.name;
+                const price = button.dataset.price;
+                addToCart(name, price);
+                alert(`${name} added to cart!`);
+            });
+        });
+
+        document.getElementById('checkoutBtn').addEventListener('click', () => {
+            if(cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            alert(`Checkout successful! Total: ₱${document.getElementById('cartTotal').textContent}`);
+            localStorage.removeItem('cart');
+            cart = [];
+            updateCart();
+            bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+        });
+
+        updateCart();
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('store-container').style.display = 'block';
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = this.querySelector('input[type="password"]').value;
+            const confirmPassword = this.querySelector('input[type="password"]:last-of-type').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            alert('Account created successfully!');
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('store-container').style.display = 'block';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('store-container').style.display = 'none';
+            document.getElementById('auth-container').style.display = 'block';
+            document.getElementById('loginForm').reset();
+            document.getElementById('signupForm').reset();
+            document.querySelector('#authTabs button:first-child').click();
+        });
+    </script>
+</body>
+</html>
